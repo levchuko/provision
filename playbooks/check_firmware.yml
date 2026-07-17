@@ -1,0 +1,27 @@
+---
+- name: Check firmware version
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Read firmware version
+      shell: |
+        system_profiler SPHardwareDataType | grep "System Firmware Version" | awk -F': ' '{print $2}'
+      register: fw
+      changed_when: false
+
+    - name: Show current firmware
+      debug:
+        msg:
+          - "Current firmware : {{ fw.stdout }}"
+          - "Expected firmware: {{ expected_firmware_version }}"
+
+    - name: Firmware is up to date
+      debug:
+        msg: "up to date"
+      when: fw.stdout == expected_firmware_version
+
+    - name: Firmware needs upgrade
+      debug:
+        msg: "needs upgrade"
+      when: fw.stdout != expected_firmware_version
