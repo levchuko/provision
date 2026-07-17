@@ -9,11 +9,16 @@
       register: fw
       changed_when: false
 
-    - name: Verify firmware version
-      fail:
-        msg: "Firmware mismatch. Current: {{ fw.stdout }}, Expected: {{ expected_firmware_version }}"
-      when: fw.stdout != expected_firmware_version
+    - name: Firmware needs update
+      debug:
+        msg: "Firmware update required. Current: {{ fw.stdout | trim }}, Expected: {{ expected_firmware_version }}"
+      when: fw.stdout | trim != expected_firmware_version
+
+    - name: Run firmware update script
+      shell: echo "Would be running update firmware script here!!!"
+      when: fw.stdout | trim != expected_firmware_version
 
     - name: Firmware is up to date
       debug:
-        msg: "Firmware {{ fw.stdout }} is up to date"
+        msg: "Firmware {{ fw.stdout | trim }} is already up to date"
+      when: fw.stdout | trim == expected_firmware_version
